@@ -4,6 +4,7 @@ class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
     description = models.TextField(blank=True)
     parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL, related_name='children')
+    restaurant = models.ForeignKey('restaurants.Restaurant', on_delete=models.CASCADE, related_name='categories')
 
     def __str__(self):
         return self.name
@@ -15,6 +16,7 @@ class Dish(models.Model):
     price = models.DecimalField(max_digits=8, decimal_places=2)
     is_available = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    restaurant = models.ForeignKey('restaurants.Restaurant', on_delete=models.CASCADE, related_name='dishes')
 
     def __str__(self):
         return self.name

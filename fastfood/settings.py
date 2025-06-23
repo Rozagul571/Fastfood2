@@ -4,11 +4,9 @@ from datetime import timedelta
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
-import users
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-&1xl6u0!bb#+mh!=yau14fzn(1m9*rt(%uuy)5!7^4=*068ov$'
 env = environ.Env()
 environ.Env.read_env(BASE_DIR / ".env")
@@ -29,6 +27,7 @@ INSTALLED_APPS = [
 
     # 3rd
     'rest_framework',
+    'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
     'rest_framework.authtoken',
     'drf_yasg',
@@ -80,25 +79,36 @@ DATABASES = {
 }
 
 AUTH_PASSWORD_VALIDATORS = [
-    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
+    {
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+     },
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
 ]
 
 AUTH_USER_MODEL = 'users.User'
+
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
+        'fastfood.permissions.Permissions',
     ),
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 20,
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(hours=1),
+    "ACCESS_TOKEN_LIFETIME": timedelta(hours=4),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "AUTH_HEADER_TYPES": ("Bearer",),
     "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
@@ -120,6 +130,7 @@ SWAGGER_SETTINGS = {
 }
 
 LANGUAGE_CODE = 'en-us'
+
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
@@ -127,6 +138,6 @@ USE_TZ = True
 
 
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [BASE_DIR / 'static']
+# STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

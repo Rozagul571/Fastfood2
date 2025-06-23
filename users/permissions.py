@@ -1,32 +1,23 @@
-from rest_framework.permissions import BasePermission
+from rest_framework import permissions
 
-class RoleBasedPermission(BasePermission):
+class IsAdmin(permissions.BasePermission):
     def has_permission(self, request, view):
-        user = request.user
-        print(user)
-        if not user or not user.is_authenticated:
-            return False
-        if user.role == 'admin':
-            return True
-        allowed_roles = getattr(view, "allowed_roles", None)
-        if allowed_roles and user.role in allowed_roles:
-            return True
-        if getattr(view, "basename", None) == "user":
-            return request.method in ("GET", "HEAD", "OPTIONS")
-        return False
+        return request.user.is_authenticated and request.user.role == 'admin'
 
+class IsWaiter(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return request.user.is_authenticated and request.user.role == 'waiter'
+
+class IsUser(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return request.user.is_authenticated and request.user.role == 'user'
+
+class IsAdminOrWaiter(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return request.user.is_authenticated and request.user.role in ['admin', 'waiter']
+
+class IsOwnerOrAdmin(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
-        user = request.user
-        if not user or not user.is_authenticated:
-            return False
-        if user.role == 'admin':
-            return True
-        if user.role == 'waiter':
-            if hasattr(obj, "waiters"):
-                return user in obj.waiters.all()
-            if hasattr(obj, "restaurant"):
-                return user in obj.restaurant.waiters.all()
-        if user.role == 'user':
-            if hasattr(obj, "user"):
-                return obj.user == user
-        return False
+        return request.user.is_authenticated and (
+            request.user.role == 'admin' or obj == request.user
+        )
