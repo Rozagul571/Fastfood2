@@ -57,7 +57,6 @@ class OrderSerializer(serializers.ModelSerializer):
         #     dish = item['dish']
         #     if dish.restaurant != restaurant:
         #         raise serializers.ValidationError(f"{dish.name} dish {restaurant.name} doesn't match")
-
         data['location'] = Point(longitude, latitude)
         data['delivery_address'] = f"latitude: {latitude}, longitude: {longitude}"
         return data
@@ -73,8 +72,7 @@ class OrderSerializer(serializers.ModelSerializer):
             distance_km = None
             delivery_fee = None
         else:
-            delivery_fee = Decimal(str(distance_km * 5000)).quantize(Decimal('0.01'))
-
+            delivery_fee = Decimal(str(distance_km * 2)).quantize(Decimal('0.01'))
 
         order = Order.objects.create(user=user,restaurant=restaurant, delivery_address=delivery_address,location=location,
             distance_km=distance_km, delivery_fee=delivery_fee)
@@ -85,10 +83,8 @@ class OrderSerializer(serializers.ModelSerializer):
             for item_data in order_items_data
         ]
         OrderItem.objects.bulk_create(order_items)
-
         total_time, preparation, delivery = estimate_delivery(order)
         quantity, price, total = calculate_totals(order)
-
         order.preparation_time = preparation
         order.delivery_time = delivery
         order.estimated_time = total_time

@@ -1,11 +1,11 @@
 from django.db import models
+from restaurants.models import Restaurant
 
 class Category(models.Model):
-    name = models.CharField(max_length=100, unique=True)
+    name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
-    parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL, related_name='children')
-    restaurant = models.ForeignKey('restaurants.Restaurant', on_delete=models.CASCADE, related_name='categories')
-
+    restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE, related_name='categories')
+    parent_category = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='subcategories')
     def __str__(self):
         return self.name
 

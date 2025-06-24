@@ -3,11 +3,22 @@ from dishes.models import Dish, Category
 from restaurants.models import Restaurant
 
 class CategorySerializer(serializers.ModelSerializer):
-    restaurant_id = serializers.PrimaryKeyRelatedField(queryset=Restaurant.objects.all(), source="restaurant", write_only=True)
+    restaurant_id = serializers.PrimaryKeyRelatedField(queryset=Restaurant.objects.all(), source='restaurant', write_only=True)
+    parent_category_id = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all(), source='parent_category', write_only=True, allow_null=True)
+    restaurant = serializers.StringRelatedField(read_only=True)
+    parent_category = serializers.StringRelatedField(read_only=True)
 
     class Meta:
         model = Category
-        fields = ('id', 'name', 'description', 'restaurant_id')
+        fields = ('id', 'name', 'description', 'restaurant', 'restaurant_id', 'parent_category', 'parent_category_id')
+        read_only_fields = ('id', 'restaurant', 'parent_category')
+
+    def validate(self, data):
+        restaurant = data['restaurant']
+        parent_category = data.get('parent_category')
+        if parent_category and parent_category.restaurant != restaurant:
+            raise serializers.ValidationError(f"{parent_category.name} kategoriyasi {restaurant.name} restoraniga tegishli emas.")
+        return data
 
 
 class DishSerializer(serializers.ModelSerializer):

@@ -3,7 +3,7 @@ from rest_framework.routers import DefaultRouter
 from dishes.views import DishViewSet, CategoryViewSet
 
 router = DefaultRouter()
-router.register('dishes', DishViewSet, basename='dish')
+router.register('', DishViewSet, basename='dish')
 router.register('categories', CategoryViewSet, basename='category')
 
 urlpatterns = [
